@@ -1,7 +1,6 @@
 package com.finnolio.chat2
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -74,9 +73,7 @@ class MainActivity : ComponentActivity() {
                                 aiResponseText = ""
                                 isLoading = true
                                 scope.launch {
-                                    Log.d("TV_APP", "Message: $userPrompt")
-
-                                    fetchAIStream(userPrompt).collect { chunk ->
+                                    fetchAIStream(chatHistory.toList()).collect { chunk ->
                                         isLoading = false
                                         aiResponseText += chunk
                                     }
