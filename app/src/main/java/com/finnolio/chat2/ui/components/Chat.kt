@@ -36,6 +36,14 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
  * @param isStreaming true or false to check if the AI is streaming
  * @param aiResponseText shows streaming text
  */
+/**
+ * Displays chat history, streaming status, and the current AI response.
+ *
+ * @param modifier Modifier applied to the chat list.
+ * @param chatHistory Messages to display in the conversation.
+ * @param isStreaming Whether the AI response is currently streaming.
+ * @param aiResponseText Current streamed AI response text.
+ */
 @Composable
 fun Chat(
     modifier: Modifier = Modifier,

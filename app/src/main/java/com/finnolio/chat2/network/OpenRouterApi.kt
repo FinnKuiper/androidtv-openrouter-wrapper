@@ -35,11 +35,10 @@ data class ChatResponse(val choices: List<Choice>)
 data class Choice(val message: Message)
 
 /**
- * Function to send 1 simple request to openrouter
+ * Sends a prompt to the OpenRouter chat-completion API and extracts the assistant's response.
  *
- * @param prompt the prompt that needs to be sent to openrouter
- *
- * @return A string with the AI output
+ * @param prompt The prompt to send to OpenRouter.
+ * @return The trimmed assistant response, or an error message if the request fails or the response cannot be parsed.
  */
 suspend fun fetchAIResponse(prompt: String): String = withContext(Dispatchers.IO) {
     val client = OkHttpClient.Builder()
@@ -83,11 +82,10 @@ suspend fun fetchAIResponse(prompt: String): String = withContext(Dispatchers.IO
 }
 
 /**
- * fetchaistream sends a prompt with context of previous messages to openrouter
+ * Streams an AI response for the supplied conversation history.
  *
- * @param history list of previous messages and latest message
- *
- * @return Flow of string that streams the output of the AI model
+ * @param history The conversation messages, including the latest message.
+ * @return A flow of text chunks produced by the AI model.
  */
 fun fetchAIStream(history: List<ChatMessage>): Flow<String> = callbackFlow {
     val client =

@@ -34,6 +34,13 @@ import com.finnolio.chat2.ui.theme.Chat2Theme
  *
  * @param onSubmit accepts the submit function
  */
+/**
+ * Displays a single-line input for submitting chat prompts.
+ *
+ * Empty prompts are ignored. After a valid submission, the input is cleared and the software keyboard is hidden.
+ *
+ * @param onSubmit Called with the submitted prompt text.
+ */
 @Composable
 fun ChatInput(onSubmit: (String) -> Unit) {
     var promptText by remember { mutableStateOf("") }
