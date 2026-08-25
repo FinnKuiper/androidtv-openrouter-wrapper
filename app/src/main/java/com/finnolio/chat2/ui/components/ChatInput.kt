@@ -41,6 +41,9 @@ fun ChatInput(onSubmit: (String) -> Unit) {
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
         keyboardActions = KeyboardActions(onSend = {
+            if (promptText.isEmpty()) {
+                return@KeyboardActions
+            }
             onSubmit(promptText)
             keyboardController?.hide()
             promptText = ""

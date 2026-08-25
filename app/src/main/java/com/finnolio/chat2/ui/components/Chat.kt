@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,7 +30,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 fun Chat(
     modifier: Modifier = Modifier,
     chatHistory: SnapshotStateList<ChatMessage>,
-    isLoading: Boolean,
+    isStreaming: Boolean,
     aiResponseText: String
 ) {
     val listState = rememberLazyListState()
@@ -38,7 +39,7 @@ fun Chat(
         val totalItems =
             chatHistory.size +
                     (if (aiResponseText.isNotEmpty()) 1 else 0) +
-                    (if (isLoading) 1 else 0)
+                    (if (isStreaming) 1 else 0)
 
         if (totalItems > 0) {
             listState.animateScrollToItem(totalItems - 1)
@@ -76,22 +77,25 @@ fun Chat(
             }
         }
 
+        if (isStreaming) {
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White
+                    )
+                    Text("Loading...")
+                }
+
+            }
+        }
+
         if (aiResponseText.isNotEmpty()) {
             item {
                 MarkdownText(
                     markdown = aiResponseText,
                     style = TextStyle(color = Color.White)
                 )
-            }
-        }
-
-        if (isLoading) {
-            item {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = Color.White
-                )
-                Text("Loading...")
             }
         }
     }

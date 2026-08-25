@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                 val chatHistory = remember { mutableStateListOf<ChatMessage>() }
 
                 var aiResponseText by remember { mutableStateOf("") }
-                var isLoading by remember { mutableStateOf(false) }
+                var isStreaming by remember { mutableStateOf(false) }
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -63,27 +63,37 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxSize()
-                                    .padding(bottom = 16.dp), chatHistory, isLoading, aiResponseText
+                                    .padding(bottom = 16.dp),
+                                chatHistory,
+                                isStreaming,
+                                aiResponseText
                             )
                             ChatInput(onSubmit = { userPrompt ->
+                                if (isStreaming) return@ChatInput
+
                                 chatHistory.add(
                                     ChatMessage(userPrompt, true)
                                 )
-
                                 aiResponseText = ""
-                                isLoading = true
+                                isStreaming = true
+
                                 scope.launch {
-                                    fetchAIStream(chatHistory.toList()).collect { chunk ->
-                                        isLoading = false
-                                        aiResponseText += chunk
+                                    try {
+                                        fetchAIStream(chatHistory.toList()).collect { chunk ->
+                                            aiResponseText += chunk
+                                        }
+                                    } finally {
+                                        if (aiResponseText.isNotEmpty()) {
+                                            chatHistory.add(
+                                                ChatMessage(
+                                                    text = aiResponseText,
+                                                    isUser = false
+                                                )
+                                            )
+                                        }
+                                        aiResponseText = ""
+                                        isStreaming = false
                                     }
-                                    chatHistory.add(
-                                        ChatMessage(
-                                            text = aiResponseText,
-                                            isUser = false
-                                        )
-                                    )
-                                    aiResponseText = ""
                                 }
                             })
                         }
