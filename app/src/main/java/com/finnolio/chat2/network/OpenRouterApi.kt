@@ -2,6 +2,7 @@ package com.finnolio.chat2.network
 
 import android.util.Log
 import com.finnolio.chat2.BuildConfig
+import com.finnolio.chat2.ChatMessage
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -18,6 +19,7 @@ import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
 import java.util.concurrent.TimeUnit
 
+
 data class Message(val role: String, val content: String)
 data class ChatRequest(
     val model: String,
@@ -32,6 +34,12 @@ data class Delta(val content: String?)
 data class ChatResponse(val choices: List<Choice>)
 data class Choice(val message: Message)
 
+/**
+ * Sends a prompt to the OpenRouter chat-completion API and extracts the assistant's response.
+ *
+ * @param prompt The prompt to send to OpenRouter.
+ * @return The trimmed assistant response, or an error message if the request fails or the response cannot be parsed.
+ */
 suspend fun fetchAIResponse(prompt: String): String = withContext(Dispatchers.IO) {
     val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -73,13 +81,25 @@ suspend fun fetchAIResponse(prompt: String): String = withContext(Dispatchers.IO
         }
 }
 
-fun fetchAIStream(prompt: String): Flow<String> = callbackFlow {
+/**
+ * Streams an AI response for the supplied conversation history.
+ *
+ * @param history The conversation messages, including the latest message.
+ * @return A flow of text chunks produced by the AI model.
+ */
+fun fetchAIStream(history: List<ChatMessage>): Flow<String> = callbackFlow {
     val client =
-        OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS).build()
+        OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(0, TimeUnit.MILLISECONDS).build()
     val gson = Gson()
 
+    val apiMessages = history.map({ msg ->
+        val role = if (msg.isUser) "user" else "assistant"
+        Message(role = role, content = msg.text)
+    })
+
     val requestData =
-        ChatRequest("deepseek/deepseek-v4-flash-0731", listOf(Message("user", prompt)))
+        ChatRequest("deepseek/deepseek-v4-flash-0731", apiMessages)
     val request = Request.Builder()
         .url("https://openrouter.ai/api/v1/chat/completions")
         .post(gson.toJson(requestData).toRequestBody("application/json".toMediaType()))
