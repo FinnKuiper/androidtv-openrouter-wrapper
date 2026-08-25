@@ -27,13 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
 import com.finnolio.chat2.ui.theme.Chat2Theme
 
-/**
- * The input for AI responses
- *
- * When input is submitted it will return the submit function
- *
- * @param onSubmit accepts the submit function
- */
+
 /**
  * Displays a single-line input for submitting chat prompts.
  *
