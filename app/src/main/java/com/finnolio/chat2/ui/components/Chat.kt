@@ -26,6 +26,16 @@ import androidx.tv.material3.Text
 import com.finnolio.chat2.ChatMessage
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
+/**
+ * A chat that accepts messages
+ *
+ * This composable shows messages based on user messages and AI output. Also shows the loading state.
+ *
+ * @param modifier
+ * @param chatHistory list of the chat messages
+ * @param isStreaming true or false to check if the AI is streaming
+ * @param aiResponseText shows streaming text
+ */
 @Composable
 fun Chat(
     modifier: Modifier = Modifier,

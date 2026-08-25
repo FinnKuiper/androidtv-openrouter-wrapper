@@ -19,6 +19,7 @@ import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
 import java.util.concurrent.TimeUnit
 
+
 data class Message(val role: String, val content: String)
 data class ChatRequest(
     val model: String,
@@ -33,6 +34,13 @@ data class Delta(val content: String?)
 data class ChatResponse(val choices: List<Choice>)
 data class Choice(val message: Message)
 
+/**
+ * Function to send 1 simple request to openrouter
+ *
+ * @param prompt the prompt that needs to be sent to openrouter
+ *
+ * @return A string with the AI output
+ */
 suspend fun fetchAIResponse(prompt: String): String = withContext(Dispatchers.IO) {
     val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -74,6 +82,13 @@ suspend fun fetchAIResponse(prompt: String): String = withContext(Dispatchers.IO
         }
 }
 
+/**
+ * fetchaistream sends a prompt with context of previous messages to openrouter
+ *
+ * @param history list of previous messages and latest message
+ *
+ * @return Flow of string that streams the output of the AI model
+ */
 fun fetchAIStream(history: List<ChatMessage>): Flow<String> = callbackFlow {
     val client =
         OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS)
