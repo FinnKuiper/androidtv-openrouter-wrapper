@@ -41,9 +41,9 @@ fun Sidebar() {
     Column(
         modifier = Modifier
             .background(Color.DarkGray)
+            .width(sidebarWidth)
             .padding(8.dp)
             .fillMaxHeight()
-            .width(sidebarWidth)
             .onFocusChanged { focusState ->
                 isExpanded = focusState.hasFocus
             }
