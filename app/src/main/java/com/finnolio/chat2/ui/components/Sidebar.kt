@@ -46,8 +46,8 @@ fun Sidebar() {
 
     Column(
         modifier = Modifier
-            .background(Color.DarkGray)
             .width(sidebarWidth)
+            .background(Color.DarkGray)
             .padding(8.dp)
             .fillMaxHeight()
             .onFocusChanged { focusState ->
