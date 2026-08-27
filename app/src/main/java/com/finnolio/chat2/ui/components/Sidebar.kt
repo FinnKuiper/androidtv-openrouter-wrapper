@@ -1,5 +1,6 @@
 package com.finnolio.chat2.ui.components
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -29,14 +31,22 @@ import androidx.tv.material3.Text
 
 @Composable
 fun Sidebar() {
-    var opened by remember { mutableStateOf(true) }
+    var isExpanded by remember { mutableStateOf(false) }
+
+    val sidebarWidth by animateDpAsState(
+        targetValue = if (isExpanded) 224.dp else 68.dp,
+        label = "sidebarwidth"
+    )
 
     Column(
         modifier = Modifier
             .background(Color.DarkGray)
             .padding(8.dp)
             .fillMaxHeight()
-            .width(224.dp)
+            .width(sidebarWidth)
+            .onFocusChanged { focusState ->
+                isExpanded = focusState.hasFocus
+            }
     ) {
         Row(
             modifier = Modifier
@@ -54,28 +64,32 @@ fun Sidebar() {
                 contentDescription = "Profile",
                 tint = Color.White
             )
-            Text("user")
+            if (isExpanded) {
+                Text("user")
+            }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            "SAVED CHATS",
-            color = Color.Gray,
-            style = TextStyle(fontSize = 12.sp),
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(3) { index ->
-                Text(
-                    text = "Chat Session ${index + 1}",
-                    color = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusable() // Lets the TV remote scroll through them
-                        .padding(8.dp)
-                )
+        if (isExpanded) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                "SAVED CHATS",
+                color = Color.Gray,
+                style = TextStyle(fontSize = 12.sp),
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(3) { index ->
+                    Text(
+                        text = "Chat Session ${index + 1}",
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusable() // Lets the TV remote scroll through them
+                            .padding(8.dp)
+                    )
+                }
             }
         }
     }
