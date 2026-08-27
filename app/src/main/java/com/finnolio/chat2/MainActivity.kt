@@ -31,6 +31,9 @@ import kotlinx.coroutines.launch
 
 data class ChatMessage(val text: String, val isUser: Boolean)
 class MainActivity : ComponentActivity() {
+    /**
+     * Initializes the activity's chat interface and handles streaming AI responses.
+     */
     @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
