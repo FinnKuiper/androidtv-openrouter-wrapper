@@ -29,6 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
 
+/**
+ * Displays a focus-responsive sidebar with a profile row and saved chat sessions.
+ *
+ * The sidebar expands when it or one of its focusable descendants receives focus and
+ * collapses when focus is lost.
+ */
 @Composable
 fun Sidebar() {
     var isExpanded by remember { mutableStateOf(false) }
