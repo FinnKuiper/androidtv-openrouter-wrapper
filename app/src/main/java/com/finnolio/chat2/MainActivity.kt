@@ -3,8 +3,9 @@ package com.finnolio.chat2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,11 +25,15 @@ import androidx.tv.material3.Surface
 import com.finnolio.chat2.network.fetchAIStream
 import com.finnolio.chat2.ui.components.Chat
 import com.finnolio.chat2.ui.components.ChatInput
+import com.finnolio.chat2.ui.components.Sidebar
 import com.finnolio.chat2.ui.theme.Chat2Theme
 import kotlinx.coroutines.launch
 
 data class ChatMessage(val text: String, val isUser: Boolean)
 class MainActivity : ComponentActivity() {
+    /**
+     * Initializes the activity's chat interface and handles streaming AI responses.
+     */
     @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,56 +51,59 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     shape = RectangleShape
                 ) {
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.BottomCenter
-                    ) {
-                        Column(
+                    Row {
+                        Sidebar()
+                        Row(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .width(500.dp)
-                                .padding(vertical = 32.dp)
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Chat(
+                            Column(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxSize()
-                                    .padding(bottom = 16.dp),
-                                chatHistory,
-                                isStreaming,
-                                aiResponseText
-                            )
-                            ChatInput(onSubmit = { userPrompt ->
-                                if (isStreaming) return@ChatInput
-
-                                chatHistory.add(
-                                    ChatMessage(userPrompt, true)
+                                    .fillMaxHeight()
+                                    .width(500.dp)
+                                    .padding(vertical = 32.dp)
+                            ) {
+                                Chat(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxSize()
+                                        .padding(bottom = 16.dp),
+                                    chatHistory,
+                                    isStreaming,
+                                    aiResponseText
                                 )
-                                aiResponseText = ""
-                                isStreaming = true
+                                ChatInput(onSubmit = { userPrompt ->
+                                    if (isStreaming) return@ChatInput
 
-                                scope.launch {
-                                    try {
-                                        fetchAIStream(chatHistory.toList()).collect { chunk ->
-                                            aiResponseText += chunk
-                                        }
-                                    } finally {
-                                        if (aiResponseText.isNotEmpty()) {
-                                            chatHistory.add(
-                                                ChatMessage(
-                                                    text = aiResponseText,
-                                                    isUser = false
+                                    chatHistory.add(
+                                        ChatMessage(userPrompt, true)
+                                    )
+                                    aiResponseText = ""
+                                    isStreaming = true
+
+                                    scope.launch {
+                                        try {
+                                            fetchAIStream(chatHistory.toList()).collect { chunk ->
+                                                aiResponseText += chunk
+                                            }
+                                        } finally {
+                                            if (aiResponseText.isNotEmpty()) {
+                                                chatHistory.add(
+                                                    ChatMessage(
+                                                        text = aiResponseText,
+                                                        isUser = false
+                                                    )
                                                 )
-                                            )
+                                            }
+                                            aiResponseText = ""
+                                            isStreaming = false
                                         }
-                                        aiResponseText = ""
-                                        isStreaming = false
                                     }
-                                }
-                            })
+                                })
+                            }
                         }
                     }
                 }
